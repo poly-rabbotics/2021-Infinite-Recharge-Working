@@ -10,11 +10,12 @@ import frc.robot.RobotMap;
 import frc.robot.Controls.MechanismsJoystick;
 
 
-/** Add your docs here. */
+
 public class Climb extends Subsystem {
-  // Put methods for controlling this subsystem
-  // here. Call these from Commands.
+  
   public void run() {
+    //Activates climb if armed and climb button pressed
+    //Deactivates climb if not armed
     if (MechanismsJoystick.arm() && MechanismsJoystick.climbPressed() && MechanismsJoystick.climb()) {
       RobotMap.climber.set(Value.kReverse);
     } else if (!MechanismsJoystick.arm()) {

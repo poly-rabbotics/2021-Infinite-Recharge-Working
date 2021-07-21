@@ -17,19 +17,20 @@ public class DriveJoystick {
   
   public static Joystick joystick = RobotMap.driveJoystick;
   private static double lastMoveTime = 0;
+
   public static double getMove(){
-    double speed = joystick.getRawAxis(1);
+    double speed = joystick.getRawAxis(1); //Left joystick on controller, determines forward/backwards movement
     return speed;
   }
   public static double getTurn(){
-    double speed = joystick.getRawAxis(4);
+    double speed = joystick.getRawAxis(4); //Right joystick on controller, determines pivot amount
     return speed;
   }
   public static boolean getCameraOrient() {
-    return joystick.getRawButtonPressed(2); //B button
+    return joystick.getRawButtonPressed(2); //B button, switches orientation of f/b controls
   }
   public static boolean getResetEncoder() {
-    return joystick.getRawButtonPressed(4); //Y button
+    return joystick.getRawButtonPressed(4); //Y button, zeroes out drive encoders
   }
   public static boolean getStartAutoOrientLeft() {
     return joystick.getRawButtonPressed(5);
@@ -55,12 +56,11 @@ public class DriveJoystick {
     return joystick.getRawButton(3);
   }
   
-  public static boolean aim(){
-    return joystick.getRawButton(1);
+  public static boolean aim(){ //activates limelight auto-aim
+    return joystick.getRawButton(1); 
   }
 
-  // SLOW MODE
-
+  // SLOW MODE (unused, maybe useful later)
   public static boolean dPad(){
     if(getPreciseFront() || getPreciseRight() || getPreciseBack() || getPreciseLeft()){
       return true;

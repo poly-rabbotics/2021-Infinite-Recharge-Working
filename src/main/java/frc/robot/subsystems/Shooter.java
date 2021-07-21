@@ -20,7 +20,7 @@ public class Shooter extends Subsystem {
   Timer conveyorDelay = new Timer();
   Conveyor conveyor;
   ConfigJoystick stick = new ConfigJoystick();
-
+  //Change these to change shooter power
   public static double lowSetpointBottom = 0.5, medSetpointBottom = 0.325, highSetpointBottom = 0.5;
   public static double lowSetpointTop = 0.5, medSetpointTop = 0.325, highSetpointTop = 0.5;
   
@@ -34,7 +34,7 @@ public class Shooter extends Subsystem {
     SmartDashboard.putNumber("Low Setpoint Bottom",lowSetpointBottom);
     SmartDashboard.putBoolean("UpperShooterSpeedUp",ConfigJoystick.configUpperShooterSpeedUp());
 
-    if(MechanismsJoystick.farShot())
+    if(MechanismsJoystick.farShot()) //if far shot pressed, set angle, spin up, run conveyor, and shoot
     {
       RobotMap.shooterAngle.set(Value.kReverse);
       conveyorDelay.start();
@@ -54,7 +54,7 @@ public class Shooter extends Subsystem {
       else if(ConfigJoystick.configLowerShooterSpeedDown())
         highSetpointBottom-=0.001;
     }
-    else if(MechanismsJoystick.midShot())
+    else if(MechanismsJoystick.midShot()) //if mid shot pressed, set angle, spin up, run conveyor, and shoot
     {
       RobotMap.shooterAngle.set(Value.kForward);
       conveyorDelay.start();
@@ -74,7 +74,7 @@ public class Shooter extends Subsystem {
       else if(ConfigJoystick.configLowerShooterSpeedDown())
         medSetpointBottom-=0.001;
     }
-    else if(MechanismsJoystick.closeShot())
+    else if(MechanismsJoystick.closeShot()) //if far shot pressed, set angle, spin up, run conveyor, and shoot
     {
       RobotMap.shooterAngle.set(Value.kForward);
       conveyorDelay.start();

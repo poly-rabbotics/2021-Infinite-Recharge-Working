@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
-
+//MOSTLY UNUSED AND EXPERIMENTAL
 /** Add your docs here. */
 public class PixyServo extends Subsystem {
   

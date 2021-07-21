@@ -7,10 +7,8 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 
-
-
 public class Limelight {
-
+//The "eyes" of the robot
 boolean isTracking;
 static double x, y, area;
 

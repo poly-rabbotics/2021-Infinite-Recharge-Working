@@ -29,8 +29,8 @@ public class Drive extends Subsystem {
     calibrateJoy = new Joystick(2);
     timer = new Timer();
     timer.start();
-    cP = 0.0425;
-    cD = 0.0173;
+    cP = 0.0425;  //Constants determined through testing, don't change these
+    cD = 0.0173;  
     cI = 0.0014;
     move=0;
     turn=0;
@@ -51,15 +51,14 @@ public class Drive extends Subsystem {
 
   void joystickDrive()
   {
-
-    move=DriveJoystick.getMove();
+    move=DriveJoystick.getMove(); 
     turn=DriveJoystick.getTurn();
 
     move = Math.signum(move) * Math.pow(move,2);
 
     turn = Math.pow(turn,3);
 
-    if(DriveJoystick.getCameraOrient())
+    if(DriveJoystick.getCameraOrient())  //direction switch
       intakeforward = !intakeforward;
     
       if(!intakeforward)
@@ -75,7 +74,7 @@ public class Drive extends Subsystem {
     oldX = x;
     x = Limelight.getX() - 5;
     double deltaVelocity = (x - oldX) / (time - oldTime);
-    power = cP * x + (cD * deltaVelocity) + cI * accumError;
+    power = cP * x + (cD * deltaVelocity) + cI * accumError;  //The PID-based power calculation for LL auto-aim
 
         
    SmartDashboard.putNumber("deltaVelocity", deltaVelocity);
@@ -119,7 +118,7 @@ public class Drive extends Subsystem {
     adjustPIDS();
 
   }
-  public void adjustPIDS() {
+  public void adjustPIDS() { //use for adjusting PID values
         if (calibrateJoy.getRawAxis(5) < -0.5) {
             cP = cP + 0.0001;
         } else if (calibrateJoy.getRawAxis(5) > 0.5) {
@@ -144,7 +143,7 @@ public class Drive extends Subsystem {
 
   public void run(int type,double setpoint)
   {
-
+    //PURELY EXPERIMENTAL, mostly ignore this
     if(DriveJoystick.getResetEncoder())
     {
       RobotMap.leftFront.getEncoder().setPosition(0);

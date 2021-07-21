@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
- 
+//Mostly not used, but could be useful for autonomous later
 public class LIDAR extends Subsystem{
 	private I2C i2c;
 	private static byte[] distance;

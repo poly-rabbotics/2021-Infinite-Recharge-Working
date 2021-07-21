@@ -20,7 +20,7 @@ public class Intake extends Subsystem {
     double setpoint = 0.5; 
    
 
-    if(MechanismsJoystick.intake())
+    if(MechanismsJoystick.intake()) //if intake button pressed, run intake
     {
       boolean isReverse=MechanismsJoystick.reverse();
 
