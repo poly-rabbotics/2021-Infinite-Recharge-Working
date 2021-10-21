@@ -20,6 +20,7 @@ import frc.robot.subsystems.LEDLights;
 import frc.robot.subsystems.LIDAR;
 import frc.robot.subsystems.PixyServo;
 import frc.robot.subsystems.Shooter;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /**
@@ -43,6 +44,7 @@ public class Robot extends TimedRobot {
   public static LEDLights led;
   public static Intake intake;
   public static Climb climb;
+  public static Timer timer;
   Compressor comp;
 
 
@@ -66,6 +68,8 @@ public class Robot extends TimedRobot {
     pixyServo = new PixyServo();
     intake = new Intake();
     climb = new Climb();
+    timer = new Timer();
+    timer.start();
   }
 
   /**
@@ -78,7 +82,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
+    SmartDashboard.putNumber("timer", timer.get());
     led.run();
     led.pattern=2;
     comp.enabled();
@@ -100,6 +104,7 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+    timer.reset();
   }
 
   /**
@@ -107,15 +112,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+    Drive.autoRun(0, 5, 0, .3);
+    /*
+    Conveyor.autoRun(0, 4, 0.5);
+    Shooter.autoRun(0,5,2);
+    Drive.autoRun(5,8,0,0.5);
+    */
   }
 
   /**
@@ -123,8 +125,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopInit() {
-      RobotMap.leftFront.getEncoder().setPosition(0);
-      RobotMap.rightFront.getEncoder().setPosition(0);
+    RobotMap.leftFront.getEncoder().setPosition(0);
+    RobotMap.rightFront.getEncoder().setPosition(0);
 
     
   }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Controls.DriveJoystick;
 import frc.robot.Controls.MechanismsJoystick;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 /** Add your docs here. */
@@ -21,7 +22,8 @@ public class Drive extends Subsystem {
   Timer timer;
   double time, oldTime, cP, cD, cI, power, accumError;
   double x, oldX;
-  double move, turn;
+  static double move;
+  static double turn;
   Joystick calibrateJoy;
 
   public Drive()
@@ -44,10 +46,10 @@ public class Drive extends Subsystem {
 
   public static boolean isAutoDrive = false;
   public boolean intakeforward = true;
-  SpeedControllerGroup leftDrive = new SpeedControllerGroup(RobotMap.leftFront,RobotMap.leftBack);
-  SpeedControllerGroup rightDrive = new SpeedControllerGroup(RobotMap.rightFront,RobotMap.rightBack);
+  static SpeedControllerGroup leftDrive = new SpeedControllerGroup(RobotMap.leftFront,RobotMap.leftBack);
+  static SpeedControllerGroup rightDrive = new SpeedControllerGroup(RobotMap.rightFront,RobotMap.rightBack);
 
-  public DifferentialDrive drive = new DifferentialDrive(leftDrive,rightDrive);
+  public static DifferentialDrive drive = new DifferentialDrive(leftDrive,rightDrive);
 
   void joystickDrive()
   {
@@ -88,35 +90,24 @@ public class Drive extends Subsystem {
 
   }
 
-  public void move(){
+  public static void move() {
     drive.arcadeDrive(move, turn);
   }
-  boolean autoDrive(double distance)
-  {
-    boolean done=false;
 
-    if(Math.abs(RobotMap.leftFront.getEncoder().getPosition())>distance&&Math.abs(RobotMap.rightFront.getEncoder().getPosition())>distance)
-    
-      done=true;
-    else done=false;
-    drive.arcadeDrive(move,turn);
-
-    if(done)
-    {
-      isAutoDrive=false;
-      RobotMap.leftFront.getEncoder().setPosition(0);
-      RobotMap.rightFront.getEncoder().setPosition(0);
-    }
-
-    return done;
-  }
-
-  public void run()
-  {
+  public void run() {
     joystickDrive();
     SmartDashboard.putNumber("joy pos", DriveJoystick.getMove());
     adjustPIDS();
 
+  }
+
+  public static void autoRun(double startTime, double endTime, double moveSpeed, double turnSpeed) {
+    double time = Robot.timer.get();
+    if (time > startTime && time < endTime) {
+      move = -moveSpeed;
+      turn = turnSpeed;
+      move();
+    }
   }
   public void adjustPIDS() { //use for adjusting PID values
         if (calibrateJoy.getRawAxis(5) < -0.5) {
@@ -140,7 +131,7 @@ public class Drive extends Subsystem {
         }
         SmartDashboard.putNumber("cI", cI);
     }
-
+  /*
   public void run(int type,double setpoint)
   {
     //PURELY EXPERIMENTAL, mostly ignore this
@@ -199,7 +190,27 @@ public class Drive extends Subsystem {
     }
       
   }
+  */
+/*boolean autoDrive(double distance)
+  {
+    boolean done=false;
 
+    if(Math.abs(RobotMap.leftFront.getEncoder().getPosition())>distance&&Math.abs(RobotMap.rightFront.getEncoder().getPosition())>distance)
+    
+      done=true;
+    else done=false;
+    drive.arcadeDrive(move,turn);
+
+    if(done)
+    {
+      isAutoDrive=false;
+      RobotMap.leftFront.getEncoder().setPosition(0);
+      RobotMap.rightFront.getEncoder().setPosition(0);
+    }
+
+    return done;
+  }
+  */
   @Override
   public void initDefaultCommand() {
     // Set the default command for a subsystem here.

@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Controls.ConfigJoystick;
 import frc.robot.Controls.MechanismsJoystick;
@@ -102,6 +103,32 @@ public class Shooter extends Subsystem {
     }
 
     
+
+    
+    
+  }
+  public static void autoRun(double startTime, double endTime, int preset) {
+    //preset 1 is low, preset 2 is mid, preset 3 is high
+    double time = Robot.timer.get();
+    if(time > startTime && time < endTime) {
+      if (preset == 1) {
+        RobotMap.shooterAngle.set(Value.kForward);
+        RobotMap.top.set(TalonSRXControlMode.PercentOutput,-lowSetpointTop);
+        RobotMap.bottom.set(TalonSRXControlMode.PercentOutput,lowSetpointBottom);
+      } else if (preset == 2) {
+        RobotMap.shooterAngle.set(Value.kForward);
+        RobotMap.top.set(TalonSRXControlMode.PercentOutput,-medSetpointTop);
+        RobotMap.bottom.set(TalonSRXControlMode.PercentOutput,medSetpointBottom);
+      } else if (preset == 3) {
+        RobotMap.shooterAngle.set(Value.kReverse);
+        RobotMap.top.set(TalonSRXControlMode.PercentOutput,-highSetpointTop);
+        RobotMap.bottom.set(TalonSRXControlMode.PercentOutput,highSetpointBottom);
+      }
+      else {
+        RobotMap.top.set(TalonSRXControlMode.PercentOutput, 0);
+        RobotMap.bottom.set(TalonSRXControlMode.PercentOutput, 0);
+      }
+    }
   }
 
   @Override

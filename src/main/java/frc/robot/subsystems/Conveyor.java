@@ -8,63 +8,61 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Controls.MechanismsJoystick;
 
 /** Add your docs here. */
 public class Conveyor extends Subsystem {
 
-  PWMVictorSPX upperConveyor = RobotMap.upperConveyor;
-  PWMVictorSPX lowerConveyor = RobotMap.lowerConveyor;
-  public static double customsetpoint=0;
-  public static boolean ballDetect=false;
-  Timer ballSpacer=new Timer();  
-  public void run()
-  {
+  static PWMVictorSPX upperConveyor = RobotMap.upperConveyor;
+  static PWMVictorSPX lowerConveyor = RobotMap.lowerConveyor;
+  public static double customsetpoint = 0;
+  public static boolean ballDetect = false;
+  Timer ballSpacer = new Timer();
+
+  public void run() {
     double conveyorSpeed;
-    double setpoint = 0.8; 
-   
+    double setpoint = -0.8;
 
-    if(MechanismsJoystick.conveyor())
-    {
-      boolean isReverse=MechanismsJoystick.reverse();
+    if (MechanismsJoystick.conveyor()) {
+      boolean isReverse = MechanismsJoystick.reverse();
 
-      if(isReverse)
-      {
-        conveyorSpeed=-1*setpoint;
-      }
-      else conveyorSpeed=setpoint;
+      if (isReverse) {
+        conveyorSpeed = -1 * setpoint;
+      } else
+        conveyorSpeed = setpoint;
 
-      
-    }
-    else{
-      //Run if prox sensor detects ball
+    } else {
+      // Run if prox sensor detects ball
 
-      if(!RobotMap.proxSensorLow.get()&&RobotMap.proxSensorHigh.get())
-      {
-        conveyorSpeed=setpoint;
-        ballDetect=true;
+      if (!RobotMap.proxSensorLow.get() && RobotMap.proxSensorHigh.get()) {
+        conveyorSpeed = setpoint;
+        ballDetect = true;
         ballSpacer.reset();
         ballSpacer.start();
-      }
-      else if(RobotMap.proxSensorLow.get()&&ballDetect)
-      {        
-        SmartDashboard.putNumber("Ball Spacer",ballSpacer.get());
-        conveyorSpeed=setpoint;
-        if(ballSpacer.get()>0.2)
-        {
-          ballDetect=false;
-          conveyorSpeed=customsetpoint;
+      } else if (RobotMap.proxSensorLow.get() && ballDetect) {
+        SmartDashboard.putNumber("Ball Spacer", ballSpacer.get());
+        conveyorSpeed = setpoint;
+        if (ballSpacer.get() > 0.2) {
+          ballDetect = false;
+          conveyorSpeed = customsetpoint;
         }
-      }
-       else conveyorSpeed=customsetpoint;
-      } 
-    
+      } else
+        conveyorSpeed = customsetpoint;
+    }
 
-      lowerConveyor.set(-1*conveyorSpeed);
-      upperConveyor.set(conveyorSpeed);
+    lowerConveyor.set(-1 * conveyorSpeed);
+    upperConveyor.set(conveyorSpeed);
   }
 
+  public static void autoRun(double startTime, double endTime, double conveyorSpeed) {
+    double time = Robot.timer.get();
+    if (time > startTime && time < endTime) {
+      lowerConveyor.set(conveyorSpeed);
+      upperConveyor.set(-conveyorSpeed);
+    }
+  }
   @Override
   public void initDefaultCommand() {
     // Set the default command for a subsystem here.
