@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotMap;
 import frc.robot.Controls.MechanismsJoystick;
 
@@ -21,6 +22,7 @@ public class Climb extends Subsystem {
     } else if (!MechanismsJoystick.arm()) {
       RobotMap.climber.set(Value.kForward);
     } 
+    SmartDashboard.putBoolean("Climb Armed", MechanismsJoystick.arm());
   }
   @Override
   public void initDefaultCommand() {

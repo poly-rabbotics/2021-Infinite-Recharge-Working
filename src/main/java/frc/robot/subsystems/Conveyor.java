@@ -23,13 +23,14 @@ public class Conveyor extends Subsystem {
 
   public void run() {
     double conveyorSpeed;
-    double setpoint = -0.8;
-
+    double setpoint = 0.8;
+    SmartDashboard.putBoolean("Conveyor Reveresed", MechanismsJoystick.reverse());
     if (MechanismsJoystick.conveyor()) {
       boolean isReverse = MechanismsJoystick.reverse();
 
       if (isReverse) {
         conveyorSpeed = -1 * setpoint;
+        
       } else
         conveyorSpeed = setpoint;
 
@@ -52,8 +53,8 @@ public class Conveyor extends Subsystem {
         conveyorSpeed = customsetpoint;
     }
 
-    lowerConveyor.set(-1 * conveyorSpeed);
-    upperConveyor.set(conveyorSpeed);
+    lowerConveyor.set(conveyorSpeed);
+    upperConveyor.set(-conveyorSpeed);
   }
 
   public static void autoRun(double startTime, double endTime, double conveyorSpeed) {

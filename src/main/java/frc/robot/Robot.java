@@ -83,9 +83,13 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     SmartDashboard.putNumber("timer", timer.get());
+    double robotPressure = 40.16 * (RobotMap.pressureTransducer.getVoltage() - 0.52);
     led.run();
     led.pattern=2;
     comp.enabled();
+    SmartDashboard.putNumber("Robot Pressure",robotPressure );
+    boolean safeToClimb = robotPressure > 60;
+    SmartDashboard.putBoolean("Safe To Climb", safeToClimb);
   }
 
   /**
@@ -112,7 +116,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    Drive.autoRun(0, 5, 0, .3);
+    Drive.autoRun(0, 5, 0.4, 0);
     /*
     Conveyor.autoRun(0, 4, 0.5);
     Shooter.autoRun(0,5,2);

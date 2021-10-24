@@ -46,4 +46,5 @@ public class RobotMap {
     // Analog Input
     public static final AnalogInput sonar = new AnalogInput(0);
     public static final AnalogInput pixyposition = new AnalogInput(2);
+    public static final AnalogInput pressureTransducer = new AnalogInput(3);
 }
