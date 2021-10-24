@@ -53,14 +53,14 @@ public class Conveyor extends Subsystem {
         conveyorSpeed = customsetpoint;
     }
 
-    lowerConveyor.set(conveyorSpeed);
+    lowerConveyor.set(-conveyorSpeed);
     upperConveyor.set(-conveyorSpeed);
   }
 
   public static void autoRun(double startTime, double endTime, double conveyorSpeed) {
     double time = Robot.timer.get();
     if (time > startTime && time < endTime) {
-      lowerConveyor.set(conveyorSpeed);
+      lowerConveyor.set(-conveyorSpeed);
       upperConveyor.set(-conveyorSpeed);
     }
   }

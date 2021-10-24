@@ -74,7 +74,7 @@ public class Drive extends Subsystem {
     oldTime = time;
     time = timer.get();
     oldX = x;
-    x = Limelight.getX() - 5;
+    x = Limelight.getX() +7;
     double deltaVelocity = (x - oldX) / (time - oldTime);
     power = cP * x + (cD * deltaVelocity) + cI * accumError;  //The PID-based power calculation for LL auto-aim
 
@@ -98,6 +98,7 @@ public class Drive extends Subsystem {
     joystickDrive();
     SmartDashboard.putNumber("joy pos", DriveJoystick.getMove());
     adjustPIDS();
+    SmartDashboard.putBoolean("Intake Front?", intakeforward);
 
   }
 

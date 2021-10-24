@@ -22,8 +22,8 @@ public class Shooter extends Subsystem {
   Conveyor conveyor;
   ConfigJoystick stick = new ConfigJoystick();
   //Change these to change shooter power
-  public static double lowSetpointBottom = 0.5, medSetpointBottom = 0.325, highSetpointBottom = 0.5;
-  public static double lowSetpointTop = 0.5, medSetpointTop = 0.325, highSetpointTop = 0.5;
+  public static double lowSetpointBottom = 0.5, medSetpointBottom = 0.345, highSetpointBottom = 0.5;
+  public static double lowSetpointTop = 0.5, medSetpointTop = 0.345, highSetpointTop = 0.5;
   
   public void run()
   {

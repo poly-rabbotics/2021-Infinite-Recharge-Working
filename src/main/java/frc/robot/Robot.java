@@ -21,6 +21,7 @@ import frc.robot.subsystems.LIDAR;
 import frc.robot.subsystems.PixyServo;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.AutoModes;
 
 
 /**
@@ -45,6 +46,7 @@ public class Robot extends TimedRobot {
   public static Intake intake;
   public static Climb climb;
   public static Timer timer;
+  public static AutoModes autoModes;
   Compressor comp;
 
 
@@ -69,6 +71,7 @@ public class Robot extends TimedRobot {
     intake = new Intake();
     climb = new Climb();
     timer = new Timer();
+    autoModes = new AutoModes();
     timer.start();
   }
 
@@ -90,6 +93,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Robot Pressure",robotPressure );
     boolean safeToClimb = robotPressure > 60;
     SmartDashboard.putBoolean("Safe To Climb", safeToClimb);
+    SmartDashboard.putNumber("Sonar (inches)",RobotMap.sonar.getAverageVoltage()/.00977/2.53);
   }
 
   /**
@@ -109,6 +113,7 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
     timer.reset();
+    autoModes.setMode();
   }
 
   /**
@@ -116,12 +121,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    Drive.autoRun(0, 5, 0.4, 0);
+    autoModes.run();
+    //Drive.autoRun(0, 5, 0.4, 0);
     /*
     Conveyor.autoRun(0, 4, 0.5);
     Shooter.autoRun(0,5,2);
     Drive.autoRun(5,8,0,0.5);
     */
+    //Conveyor.autoRun(2, 4, 0.8);
+    //Shooter.autoRun(0,4,1);
   }
 
   /**
@@ -131,8 +139,6 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     RobotMap.leftFront.getEncoder().setPosition(0);
     RobotMap.rightFront.getEncoder().setPosition(0);
-
-    
   }
 
   /**
@@ -144,7 +150,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putBoolean("Prox Sensor", !RobotMap.proxSensorLow.get());
 
-    SmartDashboard.putNumber("Sonar (inches)",RobotMap.sonar.getAverageVoltage()/.00977/2.53);
+    
     SmartDashboard.putBoolean("Pixy Detect", RobotMap.pixydetect.get());
     SmartDashboard.putNumber("Pixy Angle",RobotMap.pixyposition.getAverageVoltage());
 

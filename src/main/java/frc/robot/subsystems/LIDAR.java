@@ -67,7 +67,19 @@ public class LIDAR extends Subsystem{
 		public void run() {
 			while(true) {
 				update();
-				SmartDashboard.putNumber("LIDAR distance Inches", (getDistance() / 2.54));
+				double inches = getDistance() / 2.54;
+				SmartDashboard.putNumber("LIDAR distance Inches", inches);
+				if (inches < 50 && inches > 40) {
+					SmartDashboard.putBoolean("In Range Close Shot", true);
+				} else {
+					SmartDashboard.putBoolean("In Range Close Shot", false);
+				}
+
+				if (inches < 150 && inches > 130) {
+					SmartDashboard.putBoolean("In Range Mid Shot", true);
+				} else {
+					SmartDashboard.putBoolean("In Range Mid Shot", false);
+				}
 				try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {

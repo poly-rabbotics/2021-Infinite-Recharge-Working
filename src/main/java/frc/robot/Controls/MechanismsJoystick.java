@@ -44,6 +44,17 @@ public class MechanismsJoystick {
         }
 
         
+        public static boolean autoSwitchOne(){
+          return joystick.getRawButton(1);
+        }
+    
+        public static boolean autoSwitchTwo(){
+          return joystick.getRawButton(2);
+        }
+    
+        public static boolean autoSwitchThree(){
+          return joystick.getRawButton(3);
+        }
 
 
 }
