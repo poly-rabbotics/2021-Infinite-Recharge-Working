@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.Controls.MechanismsJoystick;
 
@@ -24,27 +25,29 @@ public class AutoModes {
         three = 0;
     }
     public void setMode(){
-        if(RobotState.isAutonomous() && MechanismsJoystick.autoSwitchOne()){
+        if(MechanismsJoystick.autoSwitchOne()){
             one = 1;
         }
         else{one = 0;}
-        if(RobotState.isAutonomous() && MechanismsJoystick.autoSwitchTwo()) {
+        if(MechanismsJoystick.autoSwitchTwo()) {
             two = 2;
         }
         else{two = 0;}
-        if(RobotState.isAutonomous() && MechanismsJoystick.autoSwitchThree()){
+        if(MechanismsJoystick.autoSwitchThree()){
             three = 4;
         }
         else{three = 0;}
         autoMode = one + two + three;
+        SmartDashboard.putNumber("Autonomous Mode", autoMode);
     }
 
-    // Mode One shoots three balls then drives past the initiation line
+    // Mode Zero shoots three balls then drives past the initiation line
     public void modeZero(){
-
         Shooter.autoRun(0, 5, 2);
         Conveyor.autoRun(2, 5, 0.8);
         Drive.autoRun(5, 6, 0.5,0);
+        Shooter.autoRun(5,15,0);
+        Conveyor.autoRun(5, 15, 0);
     }
 
     public void modeOne(){
@@ -61,10 +64,13 @@ public class AutoModes {
         Drive.autoRun(2, 4, 0, 0.5);
     }
 
-    public void modeThree(){
+    public void modeThree(){ //MOST COMMONLY USED: DRIVE FORWARD TO POWER PORT, SHOOT 3 TIMES
         Drive.autoRun(5, 6, 0.5,0);
+        Drive.autoRun(6,15,-0.01,0);
         Shooter.autoRun(6, 11, 1);
         Conveyor.autoRun(8, 11,0.8);
+        Conveyor.autoRun(11, 15, 0);
+        Shooter.autoRun(11,15,0);
         
     }
 
@@ -96,6 +102,7 @@ public class AutoModes {
     
 
     public void run(){
+        
         if(autoMode == 0){
             modeZero();
         }

@@ -90,10 +90,20 @@ public class Robot extends TimedRobot {
     led.run();
     led.pattern=2;
     comp.enabled();
+    autoModes.setMode();
+    if(isDisabled()){
+      LEDLights.pattern = 2;
+    }
+    else if(isAutonomous()){
+      LEDLights.pattern = 1;
+    }
     SmartDashboard.putNumber("Robot Pressure",robotPressure );
     boolean safeToClimb = robotPressure > 60;
     SmartDashboard.putBoolean("Safe To Climb", safeToClimb);
     SmartDashboard.putNumber("Sonar (inches)",RobotMap.sonar.getAverageVoltage()/.00977/2.53);
+    SmartDashboard.putNumber("Left RPM", RobotMap.leftBack.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Right RPM", RobotMap.rightBack.getEncoder().getVelocity());
+    SmartDashboard.putString("Drive Mode", Drive.driveMode);
   }
 
   /**
@@ -109,11 +119,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
+    //m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    
     timer.reset();
-    autoModes.setMode();
+    
   }
 
   /**
@@ -121,14 +131,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+    SmartDashboard.putNumber("Autonomous Time Remaining", 15 - timer.get());
     autoModes.run();
+    
     //Drive.autoRun(0, 5, 0.4, 0);
     /*
     Conveyor.autoRun(0, 4, 0.5);
     Shooter.autoRun(0,5,2);
     Drive.autoRun(5,8,0,0.5);
     */
-    //Conveyor.autoRun(2, 4, 0.8);
+    //Conveyor.autoRun(2, 4, 0.8); o o                                                                          t
     //Shooter.autoRun(0,4,1);
   }
 

@@ -1,4 +1,6 @@
-//PURELY EXPERIMENTAL, IGNORE THIS CLASS
+/*
+P U R E L Y  E X P E R I M E N T A L ,  I G N O R E  T H I S  C L A S S
+*/
 package frc.robot.subsystems;
 
 import frc.robot.RobotMap;

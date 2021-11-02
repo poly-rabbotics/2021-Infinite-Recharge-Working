@@ -22,93 +22,123 @@ public class Drive extends Subsystem {
   Timer timer;
   double time, oldTime, cP, cD, cI, power, accumError;
   double x, oldX;
-  static double move;
-  static double turn;
+  static double leftRPM, rightRPM;
+  static double move, turn, left, right;
   Joystick calibrateJoy;
+  public static String driveMode;
+  boolean isAligned;
 
-  public Drive()
-  {
+  public Drive() {
     calibrateJoy = new Joystick(2);
     timer = new Timer();
     timer.start();
-    cP = 0.0425;  //Constants determined through testing, don't change these
-    cD = 0.0173;  
+    cP = 0.0425; // Constants determined through testing, don't change these
+    cD = 0.0173;
     cI = 0.0014;
-    move=0;
-    turn=0;
+    move = 0;
+    turn = 0;
     oldTime = 0;
     accumError = 0;
     time = timer.get();
-    x=0;
+    x = 0;
+    driveMode = "";
   }
-
-
 
   public static boolean isAutoDrive = false;
   public boolean intakeforward = true;
-  static SpeedControllerGroup leftDrive = new SpeedControllerGroup(RobotMap.leftFront,RobotMap.leftBack);
-  static SpeedControllerGroup rightDrive = new SpeedControllerGroup(RobotMap.rightFront,RobotMap.rightBack);
+  static SpeedControllerGroup leftDrive = new SpeedControllerGroup(RobotMap.leftFront, RobotMap.leftBack);
+  static SpeedControllerGroup rightDrive = new SpeedControllerGroup(RobotMap.rightFront, RobotMap.rightBack);
+  static boolean driveSelection = DriveJoystick.driveMode();
+  public static DifferentialDrive drive = new DifferentialDrive(leftDrive, rightDrive);
 
-  public static DifferentialDrive drive = new DifferentialDrive(leftDrive,rightDrive);
+  void joystickDrive() {
+    move = DriveJoystick.getMove();
+    turn = DriveJoystick.getTurn();
+    left = -DriveJoystick.getMove();
+    right = -DriveJoystick.axisFive();
+    if (DriveJoystick.driveMode()) driveSelection = !driveSelection;
+    //driveSelection = DriveJoystick.driveMode();
+    move = Math.signum(move) * Math.pow(move, 2);
 
-  void joystickDrive()
-  {
-    move=DriveJoystick.getMove(); 
-    turn=DriveJoystick.getTurn();
+    turn = Math.pow(turn, 3);
 
-    move = Math.signum(move) * Math.pow(move,2);
-
-    turn = Math.pow(turn,3);
-
-    if(DriveJoystick.getCameraOrient())  //direction switch
+    if (DriveJoystick.getCameraOrient()) // direction switch
       intakeforward = !intakeforward;
-    
-      if(!intakeforward)
-      {
-        move = -1*move;
-      }
-        
 
-    
+    if (!intakeforward) {
+      move = -1 * move;
+      left = -left;
+      right = -right;
+    }
     double totalError = Math.abs(x);
     oldTime = time;
     time = timer.get();
     oldX = x;
-    x = Limelight.getX() +7;
+    x = Limelight.getX() -3;
     double deltaVelocity = (x - oldX) / (time - oldTime);
-    power = cP * x + (cD * deltaVelocity) + cI * accumError;  //The PID-based power calculation for LL auto-aim
+    power = cP * x + (cD * deltaVelocity) + cI * accumError; // The PID-based power calculation for LL auto-aim
+    isAligned = x<6 && x>-6;
+    SmartDashboard.putBoolean("Aim Aligned?", isAligned);
+    SmartDashboard.putNumber("deltaVelocity", deltaVelocity);
+    SmartDashboard.putNumber("PIDpower", power);
+    SmartDashboard.putNumber("cP", cP);
+    SmartDashboard.putNumber("x", x);
 
-        
-   SmartDashboard.putNumber("deltaVelocity", deltaVelocity);
-   SmartDashboard.putNumber("PIDpower", power);
-   SmartDashboard.putNumber("cP", cP);
-   SmartDashboard.putNumber("x", x);
+    if (DriveJoystick.aim())
+      drive.arcadeDrive(0, power);
+    else
+      move();
+    if (DriveJoystick.aim())
+      accumError = 0;
 
-    if (DriveJoystick.aim()) drive.arcadeDrive(0, power); 
-    else move();
-    if (DriveJoystick.aim()) accumError = 0;
+    
 
   }
 
   public static void move() {
-    drive.arcadeDrive(move, turn);
+    if (driveSelection) {
+      
+      drive.arcadeDrive(move, turn);
+      driveMode = "Arcade Drive";
+    }
+    else {
+      drive.tankDrive(left, right);
+      driveMode = "Tank Drive";
+    } 
+    //drive.arcadeDrive(move, turn);
   }
 
   public void run() {
+    leftRPM = RobotMap.leftBack.getEncoder().getVelocity();
+    rightRPM = RobotMap.rightBack.getEncoder().getVelocity();
     joystickDrive();
+    //powerCorrect();
     SmartDashboard.putNumber("joy pos", DriveJoystick.getMove());
     adjustPIDS();
     SmartDashboard.putBoolean("Intake Front?", intakeforward);
-
+    SmartDashboard.putNumber("RPM Difference", (Math.abs(leftRPM) - Math.abs(rightRPM)));
+    SmartDashboard.putBoolean("Drive Selection", driveSelection);
   }
 
   public static void autoRun(double startTime, double endTime, double moveSpeed, double turnSpeed) {
     double time = Robot.timer.get();
     if (time > startTime && time < endTime) {
-      move = -moveSpeed;
+      move = moveSpeed;
       turn = turnSpeed;
       move();
     }
+  }
+
+  public static void powerCorrect() { // Corrects for differences in RPM when purely going forward (theoretically)
+    if (DriveJoystick.getTurn() == 0) {
+      if (Math.abs(leftRPM) > Math.abs(rightRPM)) {
+        leftDrive.set(move - ((Math.abs(leftRPM) - Math.abs(rightRPM)) * 0.0001));
+      }
+      if (Math.abs(leftRPM) < Math.abs(rightRPM)) {
+        rightDrive.set(move + ((Math.abs(rightRPM) - Math.abs(leftRPM)) * 0.0001));
+      }
+    }
+    
   }
   public void adjustPIDS() { //use for adjusting PID values
         if (calibrateJoy.getRawAxis(5) < -0.5) {
@@ -132,6 +162,7 @@ public class Drive extends Subsystem {
         }
         SmartDashboard.putNumber("cI", cI);
     }
+
   /*
   public void run(int type,double setpoint)
   {

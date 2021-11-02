@@ -24,12 +24,13 @@ public class RobotMap {
     public static final CANSparkMax rightBack = new CANSparkMax(4, MotorType.kBrushless);
     public static final TalonSRX top = new TalonSRX(5);
     public static final TalonSRX bottom = new TalonSRX(6);
+    public static final CANSparkMax intake = new CANSparkMax(5, MotorType.kBrushless);
 
     // PWM Control
     public static final PWMVictorSPX colorWheel = new PWMVictorSPX(0);
     public static final PWMVictorSPX lowerConveyor = new PWMVictorSPX(1);
     public static final PWMVictorSPX upperConveyor = new PWMVictorSPX(2);
-    public static final PWMVictorSPX intake = new PWMVictorSPX(3);
+    public static final PWMVictorSPX intakeWinch = new PWMVictorSPX(3);
     public static final Servo pixyServo = new Servo(8);
     public static final AddressableLED led = new AddressableLED(9);
 
@@ -42,6 +43,7 @@ public class RobotMap {
     public static final DigitalInput proxSensorLow = new DigitalInput(2);
     public static final DigitalInput proxSensorHigh = new DigitalInput(3);    
     public static final DigitalInput pixydetect = new DigitalInput(9);
+    
 
     // Analog Input
     public static final AnalogInput sonar = new AnalogInput(0);

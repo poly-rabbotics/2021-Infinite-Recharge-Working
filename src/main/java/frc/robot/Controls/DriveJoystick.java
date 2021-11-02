@@ -26,6 +26,10 @@ public class DriveJoystick {
     double speed = joystick.getRawAxis(4); //Right joystick on controller, determines pivot amount
     return speed;
   }
+  public static double axisFive(){
+    double axis = joystick.getRawAxis(5); //right joystick vertical
+    return axis;
+  }
   public static boolean getCameraOrient() {
     return joystick.getRawButtonPressed(2); //B button, switches orientation of f/b controls
   }
@@ -50,6 +54,10 @@ public class DriveJoystick {
 
   public static boolean getFront(){
     return joystick.getRawButtonPressed(2);
+  }
+
+  public static boolean driveMode() {
+    return joystick.getRawButtonPressed(8);
   }
 
   public static boolean getToggleLight(){
