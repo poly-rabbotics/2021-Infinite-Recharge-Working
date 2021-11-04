@@ -43,6 +43,7 @@ public class RobotMap {
     public static final DigitalInput proxSensorLow = new DigitalInput(2);
     public static final DigitalInput proxSensorHigh = new DigitalInput(3);    
     public static final DigitalInput pixydetect = new DigitalInput(9);
+    public static final DigitalInput intakeLimitSwitch = new DigitalInput(5);
     
 
     // Analog Input

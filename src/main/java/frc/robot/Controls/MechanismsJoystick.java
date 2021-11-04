@@ -33,8 +33,11 @@ public class MechanismsJoystick {
         public static boolean intake(){
           return joystick.getRawButton(9);
         }
-        public static boolean intakeWinch(){
-          return joystick.getRawButton(12);
+        public static boolean intakeWinchUp(){
+          return joystick.getRawAxis(1) > 0;
+        }
+        public static boolean intakeWinchDown(){
+          return joystick.getRawAxis(1) < 0;
         }
         public static boolean climbPressed(){
           return joystick.getRawButtonPressed(10);
