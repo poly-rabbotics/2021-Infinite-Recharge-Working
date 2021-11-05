@@ -41,7 +41,7 @@ public class Drive extends Subsystem {
     accumError = 0;
     time = timer.get();
     x = 0;
-    driveMode = "";
+    driveMode = "Tank Drive";
   }
 
   public static boolean isAutoDrive = false;
@@ -83,6 +83,7 @@ public class Drive extends Subsystem {
     SmartDashboard.putNumber("PIDpower", power);
     SmartDashboard.putNumber("cP", cP);
     SmartDashboard.putNumber("x", x);
+    
 
     if (DriveJoystick.aim())
       drive.arcadeDrive(0, power);

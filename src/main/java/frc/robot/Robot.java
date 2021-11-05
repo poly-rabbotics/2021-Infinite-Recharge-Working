@@ -21,6 +21,7 @@ import frc.robot.subsystems.LIDAR;
 import frc.robot.subsystems.PixyServo;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Controls.MechanismsJoystick;
 import frc.robot.subsystems.AutoModes;
 
 
@@ -73,6 +74,7 @@ public class Robot extends TimedRobot {
     timer = new Timer();
     autoModes = new AutoModes();
     timer.start();
+    led.pattern = 2;
   }
 
   /**
@@ -85,28 +87,24 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    autoModes.setMode();
     SmartDashboard.putNumber("timer", timer.get());
     double robotPressure = 40.16 * (RobotMap.pressureTransducer.getVoltage() - 0.52);
     led.run();
-    led.pattern=2;
+    if (MechanismsJoystick.arm()) led.pattern=3;
+    else if (isDisabled()) led.pattern = 2;
+    else led.pattern = 1;
     comp.enabled();
-    autoModes.setMode();
-    if(isDisabled()){
-      LEDLights.pattern = 2;
-    }
-    else if(isAutonomous()){
-      LEDLights.pattern = 1;
-    }
+    SmartDashboard.putBoolean("Intake Down", RobotMap.intakeLimitSwitch.get());
     SmartDashboard.putNumber("Robot Pressure",robotPressure );
     boolean safeToClimb = robotPressure > 60;
     SmartDashboard.putBoolean("Safe To Climb", safeToClimb);
     SmartDashboard.putNumber("Sonar (inches)",RobotMap.sonar.getAverageVoltage()/.00977/2.53);
-    SmartDashboard.putNumber("Left RPM", RobotMap.leftBack.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Right RPM", RobotMap.rightBack.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Left Front RPM", RobotMap.leftFront.getEncoder().getVelocity());
     SmartDashboard.putString("Drive Mode", Drive.driveMode);
   }
 
-  /**
+  /*
    * This autonomous (along with the chooser code above) shows how to select
    * between different autonomous modes using the dashboard. The sendable
    * chooser code works with the Java SmartDashboard. If you prefer the
@@ -119,11 +117,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    //m_autoSelected = m_chooser.getSelected();
+    m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    
+    System.out.println("Auto selected: " + m_autoSelected);
     timer.reset();
-    
+    autoModes.setMode();
   }
 
   /**
@@ -131,16 +129,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    SmartDashboard.putNumber("Autonomous Time Remaining", 15 - timer.get());
     autoModes.run();
-    
     //Drive.autoRun(0, 5, 0.4, 0);
     /*
     Conveyor.autoRun(0, 4, 0.5);
     Shooter.autoRun(0,5,2);
     Drive.autoRun(5,8,0,0.5);
     */
-    //Conveyor.autoRun(2, 4, 0.8); o o                                                                          t
+    //Conveyor.autoRun(2, 4, 0.8);
     //Shooter.autoRun(0,4,1);
   }
 
@@ -159,7 +155,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     AutoDrive.printState();
-
+    
     SmartDashboard.putBoolean("Prox Sensor", !RobotMap.proxSensorLow.get());
 
     
