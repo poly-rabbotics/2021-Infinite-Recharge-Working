@@ -63,7 +63,13 @@ public class DriveJoystick {
   public static boolean getToggleLight(){
     return joystick.getRawButton(3);
   }
-  
+
+  public static boolean getXButton(){
+    return joystick.getRawButton(3);
+  }
+  public static boolean getYButton(){
+    return joystick.getRawButton(4);
+  }
   public static boolean aim(){ //activates limelight auto-aim
     return joystick.getRawButton(1); 
   }

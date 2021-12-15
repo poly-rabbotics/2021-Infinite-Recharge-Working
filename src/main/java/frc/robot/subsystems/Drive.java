@@ -4,6 +4,11 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
@@ -20,11 +25,16 @@ import frc.robot.RobotMap;
   
 public class Drive extends Subsystem { 
   Timer timer;
-  double time, oldTime, cP, cD, cI, power, accumError;
+  double time, oldTime, cP_LL, cD_LL, cI_LL, power_LL, accumError; //Limelight PID control vars
   double x, oldX;
-  static double leftRPM, rightRPM;
-  static double move, turn, left, right;
+  static double fts_to_RPM;
+  static double leftRPM, rightRPM, leftEncoderCounts, rightEncoderCounts;
+  static double cP, cD, cI, leftPower, rightPower; // drive speed PID control vars
+  static double leftSpeedError, rightSpeedError, leftSpeedSetpoint, rightSpeedSetpoint;
+  static double move, turn, left, right; // move and turn for arcade drive, left and right for tank
   Joystick calibrateJoy;
+  static CANSparkMax leftBack, rightBack, leftFront, rightFront;
+  static CANPIDController leftPIDController, rightPIDController;
   public static String driveMode;
   boolean isAligned;
 
@@ -32,9 +42,14 @@ public class Drive extends Subsystem {
     calibrateJoy = new Joystick(2);
     timer = new Timer();
     timer.start();
-    cP = 0.0425; // Constants determined through testing, don't change these
-    cD = 0.0173;
-    cI = 0.0014;
+    cP_LL = 0.0425; // Constants determined through testing, don't change these
+    cD_LL = 0.0173;
+    cI_LL = 0.0014;
+    cP = 0.0001; // needs testing to determine best value
+    leftSpeedError = 0;
+    rightSpeedError = 0;
+    leftSpeedSetpoint = 0;
+    rightSpeedSetpoint = 0;
     move = 0;
     turn = 0;
     oldTime = 0;
@@ -42,6 +57,15 @@ public class Drive extends Subsystem {
     time = timer.get();
     x = 0;
     driveMode = "";
+    leftBack = RobotMap.leftBack;
+    leftFront = RobotMap.leftFront;
+    rightBack = RobotMap.rightBack;
+    rightFront = RobotMap.rightFront;
+    leftPIDController = leftBack.getPIDController();
+    rightPIDController = rightBack.getPIDController();
+    leftFront.follow(leftBack);
+    rightFront.follow(rightBack);
+    fts_to_RPM = 409.3;
   }
 
   public static boolean isAutoDrive = false;
@@ -56,8 +80,9 @@ public class Drive extends Subsystem {
     turn = DriveJoystick.getTurn();
     left = -DriveJoystick.getMove();
     right = -DriveJoystick.axisFive();
-    if (DriveJoystick.driveMode()) driveSelection = !driveSelection;
-    //driveSelection = DriveJoystick.driveMode();
+    if (DriveJoystick.driveMode())
+      driveSelection = !driveSelection;
+    // driveSelection = DriveJoystick.driveMode();
     move = Math.signum(move) * Math.pow(move, 2);
 
     turn = Math.pow(turn, 3);
@@ -70,49 +95,50 @@ public class Drive extends Subsystem {
       left = -left;
       right = -right;
     }
-    double totalError = Math.abs(x);
+    accumError = Math.abs(x);
     oldTime = time;
     time = timer.get();
     oldX = x;
-    x = Limelight.getX() -3;
+    x = Limelight.getX() - 3;
     double deltaVelocity = (x - oldX) / (time - oldTime);
-    power = cP * x + (cD * deltaVelocity) + cI * accumError; // The PID-based power calculation for LL auto-aim
-    isAligned = x<6 && x>-6;
+    power_LL = cP_LL * x + (cD_LL * deltaVelocity) + cI_LL * accumError; // The PID-based power calculation for LL
+                                                                         // auto-aim
+    isAligned = x < 6 && x > -6;
     SmartDashboard.putBoolean("Aim Aligned?", isAligned);
     SmartDashboard.putNumber("deltaVelocity", deltaVelocity);
-    SmartDashboard.putNumber("PIDpower", power);
-    SmartDashboard.putNumber("cP", cP);
+    SmartDashboard.putNumber("PIDpower", power_LL);
+    SmartDashboard.putNumber("cP_LL", cP_LL);
     SmartDashboard.putNumber("x", x);
 
     if (DriveJoystick.aim())
-      drive.arcadeDrive(0, power);
+      drive.arcadeDrive(0, power_LL);
     else
       move();
     if (DriveJoystick.aim())
       accumError = 0;
 
-    
-
   }
 
   public static void move() {
     if (driveSelection) {
-      
+
       drive.arcadeDrive(move, turn);
       driveMode = "Arcade Drive";
-    }
-    else {
+    } else {
       drive.tankDrive(left, right);
       driveMode = "Tank Drive";
-    } 
-    //drive.arcadeDrive(move, turn);
+    }
+    // drive.arcadeDrive(move, turn);
   }
 
   public void run() {
     leftRPM = RobotMap.leftBack.getEncoder().getVelocity();
     rightRPM = RobotMap.rightBack.getEncoder().getVelocity();
-    joystickDrive();
-    //powerCorrect();
+    leftEncoderCounts = RobotMap.leftBack.getEncoder().getPosition();
+    rightEncoderCounts = RobotMap.rightBack.getEncoder().getPosition();
+    //joystickDrive();
+    testDrive();
+    // powerCorrect();
     SmartDashboard.putNumber("joy pos", DriveJoystick.getMove());
     adjustPIDS();
     SmartDashboard.putBoolean("Intake Front?", intakeforward);
@@ -129,38 +155,38 @@ public class Drive extends Subsystem {
     }
   }
 
-  public static void powerCorrect() { // Corrects for differences in RPM when purely going forward (theoretically)
-    if (DriveJoystick.getTurn() == 0) {
-      if (Math.abs(leftRPM) > Math.abs(rightRPM)) {
-        leftDrive.set(move - ((Math.abs(leftRPM) - Math.abs(rightRPM)) * 0.0001));
-      }
-      if (Math.abs(leftRPM) < Math.abs(rightRPM)) {
-        rightDrive.set(move + ((Math.abs(rightRPM) - Math.abs(leftRPM)) * 0.0001));
-      }
-    }
+  public static void testDrive(){
+    //controller max ft/sec = 12.21
+    //1 RPM on motor is 0.002443 ft/sec
+    
+    leftPIDController.setReference(move * 12.21 * fts_to_RPM, ControlType.kVelocity);
+    rightPIDController.setReference(-(move * 12.21 * fts_to_RPM), ControlType.kVelocity);
     
   }
+
+  
+  
   public void adjustPIDS() { //use for adjusting PID values
         if (calibrateJoy.getRawAxis(5) < -0.5) {
-            cP = cP + 0.0001;
+            cP_LL = cP_LL + 0.0001;
         } else if (calibrateJoy.getRawAxis(5) > 0.5) {
-            cP = cP - 0.0001;
+            cP_LL = cP_LL - 0.0001;
         }
-        SmartDashboard.putNumber("cD", cD);
+        SmartDashboard.putNumber("cD_LL", cD_LL);
         if (calibrateJoy.getRawAxis(1) < -0.5) {
-            cD = cD + 0.0001;
+            cD_LL = cD_LL + 0.0001;
         } else if (calibrateJoy.getRawAxis(1) > 0.5) {
-            cD = cD - 0.0001;
+            cD_LL = cD_LL - 0.0001;
         }
-        SmartDashboard.putNumber("cP", cP);
+        SmartDashboard.putNumber("cP_LL", cP_LL);
 
         if (calibrateJoy.getRawAxis(3) > 0.5) {
-            cI = cI + 0.0001;
+            cI_LL = cI_LL + 0.0001;
         } 
         if (calibrateJoy.getRawAxis(2) > 0.5) {
-            cI = cI - 0.0001;
+            cI_LL = cI_LL - 0.0001;
         }
-        SmartDashboard.putNumber("cI", cI);
+        SmartDashboard.putNumber("cI_LL", cI_LL);
     }
 
   /*
