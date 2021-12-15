@@ -56,7 +56,6 @@ public class Drive extends Subsystem {
     accumError = 0;
     time = timer.get();
     x = 0;
-<<<<<<< HEAD
     driveMode = "";
     leftBack = RobotMap.leftBack;
     leftFront = RobotMap.leftFront;
@@ -67,17 +66,19 @@ public class Drive extends Subsystem {
     leftFront.follow(leftBack);
     rightFront.follow(rightBack);
     fts_to_RPM = 409.3;
-=======
-    driveMode = "Tank Drive";
->>>>>>> b5744695b9ff36e46c0b77d3788ea34d36ef3a87
+    leftPIDController.setP(0.0002);
+    rightPIDController.setP(0.0002);
+    leftPIDController.setD(0.0);
+    rightPIDController.setD(0.0000);
+    leftPIDController.setI(0.000001);
+    rightPIDController.setI(0.000001);
   }
-
   public static boolean isAutoDrive = false;
   public boolean intakeforward = true;
   static SpeedControllerGroup leftDrive = new SpeedControllerGroup(RobotMap.leftFront, RobotMap.leftBack);
   static SpeedControllerGroup rightDrive = new SpeedControllerGroup(RobotMap.rightFront, RobotMap.rightBack);
   static boolean driveSelection = DriveJoystick.driveMode();
-  public static DifferentialDrive drive = new DifferentialDrive(leftDrive, rightDrive);
+  //public static DifferentialDrive drive = new DifferentialDrive(leftDrive, rightDrive);
 
   void joystickDrive() {
     move = DriveJoystick.getMove();
@@ -114,9 +115,11 @@ public class Drive extends Subsystem {
     SmartDashboard.putNumber("cP_LL", cP_LL);
     SmartDashboard.putNumber("x", x);
     
+    
 
     if (DriveJoystick.aim())
-      drive.arcadeDrive(0, power_LL);
+     // drive.arcadeDrive(0, power_LL);
+     {}
     else
       move();
     if (DriveJoystick.aim())
@@ -127,16 +130,18 @@ public class Drive extends Subsystem {
   public static void move() {
     if (driveSelection) {
 
-      drive.arcadeDrive(move, turn);
+     // drive.arcadeDrive(move, turn);
       driveMode = "Arcade Drive";
     } else {
-      drive.tankDrive(left, right);
+     // drive.tankDrive(left, right);
       driveMode = "Tank Drive";
     }
     // drive.arcadeDrive(move, turn);
   }
 
   public void run() {
+    move = DriveJoystick.getMove();
+
     leftRPM = RobotMap.leftBack.getEncoder().getVelocity();
     rightRPM = RobotMap.rightBack.getEncoder().getVelocity();
     leftEncoderCounts = RobotMap.leftBack.getEncoder().getPosition();
@@ -149,6 +154,7 @@ public class Drive extends Subsystem {
     SmartDashboard.putBoolean("Intake Front?", intakeforward);
     SmartDashboard.putNumber("RPM Difference", (Math.abs(leftRPM) - Math.abs(rightRPM)));
     SmartDashboard.putBoolean("Drive Selection", driveSelection);
+    SmartDashboard.putNumber("Target V", move * 12.21 * 409.3);
   }
 
   public static void autoRun(double startTime, double endTime, double moveSpeed, double turnSpeed) {

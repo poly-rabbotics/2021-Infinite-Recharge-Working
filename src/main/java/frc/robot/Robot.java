@@ -100,8 +100,10 @@ public class Robot extends TimedRobot {
     boolean safeToClimb = robotPressure > 60;
     SmartDashboard.putBoolean("Safe To Climb", safeToClimb);
     SmartDashboard.putNumber("Sonar (inches)",RobotMap.sonar.getAverageVoltage()/.00977/2.53);
-    SmartDashboard.putNumber("Left Front RPM", RobotMap.leftFront.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Left RPM", RobotMap.leftFront.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Right RPM", RobotMap.rightFront.getEncoder().getVelocity());
     SmartDashboard.putString("Drive Mode", Drive.driveMode);
+    
   }
 
   /*
