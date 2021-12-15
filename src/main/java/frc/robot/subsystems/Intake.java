@@ -44,7 +44,7 @@ public class Intake extends Subsystem {
     if (MechanismsJoystick.intakeWinchDown() && !intakeDown) {
       intakeWinchPower = 0.5;
     }
-    if (!MechanismsJoystick.intakeWinchUp()) {
+    else if (MechanismsJoystick.intakeWinchUp()) {
       intakeWinchPower = -0.5;
    } else {
      intakeWinchPower = 0;

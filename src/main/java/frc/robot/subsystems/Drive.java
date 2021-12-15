@@ -56,6 +56,7 @@ public class Drive extends Subsystem {
     accumError = 0;
     time = timer.get();
     x = 0;
+<<<<<<< HEAD
     driveMode = "";
     leftBack = RobotMap.leftBack;
     leftFront = RobotMap.leftFront;
@@ -66,6 +67,9 @@ public class Drive extends Subsystem {
     leftFront.follow(leftBack);
     rightFront.follow(rightBack);
     fts_to_RPM = 409.3;
+=======
+    driveMode = "Tank Drive";
+>>>>>>> b5744695b9ff36e46c0b77d3788ea34d36ef3a87
   }
 
   public static boolean isAutoDrive = false;
@@ -109,6 +113,7 @@ public class Drive extends Subsystem {
     SmartDashboard.putNumber("PIDpower", power_LL);
     SmartDashboard.putNumber("cP_LL", cP_LL);
     SmartDashboard.putNumber("x", x);
+    
 
     if (DriveJoystick.aim())
       drive.arcadeDrive(0, power_LL);

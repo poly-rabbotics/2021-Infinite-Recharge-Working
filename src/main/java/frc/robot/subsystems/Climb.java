@@ -23,6 +23,7 @@ public class Climb extends Subsystem {
       RobotMap.climber.set(Value.kForward);
     } 
     SmartDashboard.putBoolean("Climb Armed", MechanismsJoystick.arm());
+    
   }
   @Override
   public void initDefaultCommand() {
