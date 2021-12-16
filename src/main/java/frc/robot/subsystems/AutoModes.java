@@ -12,9 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.Controls.MechanismsJoystick;
 
-/**
- * Add your docs here.
- */
+//THIS IS ENTIRELY BASED ON RUNNING DRIVE BY SPEED AND TIME, NOT DISTANCE
+//IN THE FUTURE, WE SHOULD USE THE NEW PID DRIVE SYSTEM TO SET DISTANCE SETPOINTS
+
 public class AutoModes {
     public static double autoMode, one, two, three;
  

@@ -22,6 +22,7 @@ import frc.robot.RobotMap;
 
 /** Add your docs here. */
 
+//GEAR RATIO OF 10.71 TO 1 IN DRIVETRAIN GEARBOXES
   
 public class Drive extends Subsystem { 
   Timer timer;
@@ -45,7 +46,6 @@ public class Drive extends Subsystem {
     cP_LL = 0.0425; // Constants determined through testing, don't change these
     cD_LL = 0.0173;
     cI_LL = 0.0014;
-    cP = 0.0001; // needs testing to determine best value
     leftSpeedError = 0;
     rightSpeedError = 0;
     leftSpeedSetpoint = 0;
@@ -66,7 +66,7 @@ public class Drive extends Subsystem {
     leftFront.follow(leftBack);
     rightFront.follow(rightBack);
     fts_to_RPM = 409.3;
-    leftPIDController.setP(0.0002);
+    leftPIDController.setP(0.0002); //THESE PID VALUES LOOK GOOD OVERALL BUT COULD USE SOME OPTIMIZATION
     rightPIDController.setP(0.0002);
     leftPIDController.setD(0.0);
     rightPIDController.setD(0.0000);
@@ -141,14 +141,15 @@ public class Drive extends Subsystem {
 
   public void run() {
     move = DriveJoystick.getMove();
-
+    if ((move<0.05) || (move>-0.05)) { //deadzone between -5% and 5%
+      move = 0;
+    }
     leftRPM = RobotMap.leftBack.getEncoder().getVelocity();
     rightRPM = RobotMap.rightBack.getEncoder().getVelocity();
     leftEncoderCounts = RobotMap.leftBack.getEncoder().getPosition();
     rightEncoderCounts = RobotMap.rightBack.getEncoder().getPosition();
     //joystickDrive();
     testDrive();
-    // powerCorrect();
     SmartDashboard.putNumber("joy pos", DriveJoystick.getMove());
     adjustPIDS();
     SmartDashboard.putBoolean("Intake Front?", intakeforward);
@@ -169,15 +170,14 @@ public class Drive extends Subsystem {
   public static void testDrive(){
     //controller max ft/sec = 12.21
     //1 RPM on motor is 0.002443 ft/sec
-    
-    leftPIDController.setReference(move * 12.21 * fts_to_RPM, ControlType.kVelocity);
-    rightPIDController.setReference(-(move * 12.21 * fts_to_RPM), ControlType.kVelocity);
-    
+    //THIS WORKS!
+    leftPIDController.setReference((move * 12.21 * fts_to_RPM) + turn * 12.21 * fts_to_RPM, ControlType.kVelocity);
+    rightPIDController.setReference((-move * 12.21 * fts_to_RPM) - turn * 12.21 * fts_to_RPM, ControlType.kVelocity);
   }
 
   
   
-  public void adjustPIDS() { //use for adjusting PID values
+  public void adjustPIDS() { //use for adjusting PID values LIMELIGHT ONLY
         if (calibrateJoy.getRawAxis(5) < -0.5) {
             cP_LL = cP_LL + 0.0001;
         } else if (calibrateJoy.getRawAxis(5) > 0.5) {
